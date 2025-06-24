@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Signup() {
   const [email, setEmail] = useState('');
@@ -87,9 +87,9 @@ function Signup() {
         <div className="text-center mt-3">
           <small>
             Already have an account?{' '}
-            <a href="/login" className="text-decoration-none text-primary fw-semibold">
+            <Link to="/login" className="text-decoration-none text-primary fw-semibold">
               Login
-            </a>
+            </Link>
           </small>
         </div>
       </div>
