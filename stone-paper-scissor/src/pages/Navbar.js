@@ -26,9 +26,16 @@ function Navbar() {
   return (
     <>
       {/* Top Navbar */}
-      <nav className="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
+      <nav
+        className="navbar navbar-expand-lg sticky-top"
+        style={{
+          background: "rgba(255, 255, 255, 0.75)",
+          backdropFilter: "blur(10px)",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+        }}
+      >
         <div className="container-fluid px-3">
-          {/* Left: Logo */}
+          {/* Logo */}
           <Link className="navbar-brand d-flex align-items-center" to="/">
             <img
               src="/sps-logo-removebg-preview.png"
@@ -42,7 +49,7 @@ function Navbar() {
             </span>
           </Link>
 
-          {/* Right: Cart + Hamburger */}
+          {/* Cart & Hamburger */}
           <div className="d-flex align-items-center">
             <Link className="nav-link position-relative me-2" to="/cart">
               <span
@@ -74,18 +81,10 @@ function Navbar() {
             className="collapse navbar-collapse mt-2 mt-lg-0"
             id="navbarMobile"
           >
-            <form className="d-lg-none mb-3">
-              <input
-                className="form-control"
-                type="search"
-                placeholder="Search products..."
-              />
-            </form>
-
             <ul className="navbar-nav ms-auto align-items-start gap-2 gap-lg-3">
               <li className="nav-item">
-                <Link className="nav-link text-dark" to="/shop">
-                  Shop
+                <Link className="nav-link text-dark fw-semibold" to="/shop">
+                  🛍 Shop
                 </Link>
               </li>
 
@@ -108,14 +107,13 @@ function Navbar() {
               ) : (
                 <li className="nav-item dropdown w-100">
                   <span
-                    className="nav-link dropdown-toggle text-dark"
+                    className="nav-link dropdown-toggle text-dark fw-semibold"
                     role="button"
                     data-bs-toggle="dropdown"
                     style={{ cursor: "pointer" }}
                   >
                     👤 {user.email.split("@")[0]}
                   </span>
-
                   <ul className="dropdown-menu w-100">
                     <li>
                       <Link className="dropdown-item" to="/profile">
@@ -143,8 +141,14 @@ function Navbar() {
         </div>
       </nav>
 
-      {/* Bottom Mobile Nav (like Meesho) */}
-      <div className="d-lg-none d-flex justify-content-around bg-white shadow-sm fixed-bottom py-2 border-top">
+      {/* Bottom Mobile Nav */}
+      <div
+        className="d-lg-none d-flex justify-content-around fixed-bottom py-2 border-top"
+        style={{
+          background: "rgba(255, 255, 255, 0.9)",
+          backdropFilter: "blur(10px)",
+        }}
+      >
         <Link to="/" className="text-center text-dark">
           <i className="bi bi-house-door fs-4"></i>
           <br />

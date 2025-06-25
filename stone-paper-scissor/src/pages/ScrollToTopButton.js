@@ -24,18 +24,23 @@ function ScrollToTopButton() {
   return (
     <button
       onClick={scrollToTop}
-      className={`btn btn-dark position-fixed ${visible ? 'd-block' : 'd-none'}`}
+      className={`position-fixed ${
+        visible ? 'd-flex' : 'd-none'
+      } justify-content-center align-items-center`}
       style={{
         bottom: '20px',
         right: '20px',
         zIndex: 999,
+        width: '48px',
+        height: '48px',
         borderRadius: '50%',
-        width: '50px',
-        height: '50px',
+        background: 'rgba(255, 255, 255, 0.3)',
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        color: '#000',
         fontSize: '20px',
-        padding: '0',
-        lineHeight: '50px',
-        textAlign: 'center',
+        boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
+        transition: 'all 0.3s ease',
       }}
       aria-label="Scroll to top"
     >

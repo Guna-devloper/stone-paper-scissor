@@ -11,7 +11,7 @@ function Shop() {
   const { addToCart } = useCart();
 
   const queryParams = new URLSearchParams(location.search);
-  const selectedCategory = queryParams.get('category'); // e.g., 'stationery'
+  const selectedCategory = queryParams.get('category');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -19,7 +19,6 @@ function Shop() {
         const snapshot = await getDocs(collection(db, 'products'));
         let all = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        // Filter by category if query param exists
         if (selectedCategory) {
           all = all.filter(
             (p) => p.category?.toLowerCase() === selectedCategory.toLowerCase()
@@ -37,8 +36,14 @@ function Shop() {
   }, [selectedCategory]);
 
   return (
-    <div className="container py-4">
-      <h3 className="mb-4 text-primary text-center">
+    <div
+      className="container py-5"
+      style={{
+        background: 'linear-gradient(to bottom, #f3f4f6, #ffffff)',
+        minHeight: '100vh',
+      }}
+    >
+      <h3 className="mb-4 text-center text-primary fw-bold">
         🛍️ {selectedCategory ? `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Products` : 'All Products'}
       </h3>
 
@@ -54,26 +59,33 @@ function Shop() {
         <div className="row g-4">
           {products.map((product) => (
             <div className="col-6 col-md-3" key={product.id}>
-              <div className="card h-100 shadow-sm">
+              <div
+                className="card h-100 border-0 shadow-sm"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.7)',
+                  backdropFilter: 'blur(8px)',
+                  borderRadius: '12px',
+                }}
+              >
                 <img
                   src={product.imageBase64 || product.imageURL}
                   className="card-img-top"
                   alt={product.name}
-                  style={{ height: 180, objectFit: 'cover' }}
+                  style={{ height: 180, objectFit: 'cover', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = 'https://via.placeholder.com/180x180?text=No+Image';
                   }}
                 />
                 <div className="card-body d-flex flex-column">
-                  <h6 className="card-title">{product.name}</h6>
+                  <h6 className="card-title text-dark">{product.name}</h6>
                   <p className="text-muted small mb-1">₹{product.price}</p>
                   <div className="mb-2">
                     <span className="text-warning small">★ ★ ★ ★ ☆</span>
                     <small className="text-muted ms-1">(56)</small>
                   </div>
                   <button
-                    className="btn btn-primary btn-sm mt-auto"
+                    className="btn btn-outline-primary btn-sm mt-auto"
                     onClick={() => addToCart(product)}
                   >
                     🛒 Add to Cart

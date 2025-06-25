@@ -35,11 +35,26 @@ function Signup() {
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100">
-      <div className="card shadow-sm p-4 w-100" style={{ maxWidth: '420px' }}>
+    <div
+      className="d-flex justify-content-center align-items-center"
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(to right, #f3f4f6, #ffffff)',
+      }}
+    >
+      <div
+        className="card p-4 shadow-lg border-0"
+        style={{
+          maxWidth: '420px',
+          width: '100%',
+          background: 'rgba(255,255,255,0.85)',
+          backdropFilter: 'blur(10px)',
+          borderRadius: '16px',
+        }}
+      >
         <div className="text-center mb-4">
           <img src="/sps-logo-removebg-preview.png" alt="logo" width={60} className="mb-2" />
-          <h4 className="text-primary">Create Your Account</h4>
+          <h4 className="text-primary fw-bold">Create Your Account</h4>
         </div>
 
         <form onSubmit={handleSignup}>
@@ -79,7 +94,7 @@ function Signup() {
             </select>
           </div>
 
-          <button className="btn btn-primary w-100" type="submit" disabled={loading}>
+          <button className="btn btn-primary w-100 fw-semibold" type="submit" disabled={loading}>
             {loading ? 'Creating Account...' : 'Sign Up'}
           </button>
         </form>

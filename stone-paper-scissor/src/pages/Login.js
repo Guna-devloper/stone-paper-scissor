@@ -22,12 +22,32 @@ function Login() {
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100">
-      <div className="card shadow-sm p-4 w-100" style={{ maxWidth: '400px' }}>
+    <div
+      className="d-flex justify-content-center align-items-center vh-100"
+      style={{
+        background: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
+      }}
+    >
+      <div
+        className="p-4 rounded shadow"
+        style={{
+          width: '100%',
+          maxWidth: '400px',
+          background: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(12px)',
+          borderRadius: '12px',
+        }}
+      >
         <div className="text-center mb-4">
-          <img src="/sps-logo-removebg-preview.png" alt="logo" width={60} className="mb-2" />
-          <h4 className="text-primary">Login to Your Account</h4>
+          <img
+            src="/sps-logo-removebg-preview.png"
+            alt="logo"
+            width={60}
+            className="mb-2"
+          />
+          <h4 className="fw-bold text-gradient">Login to Your Account</h4>
         </div>
+
         <form onSubmit={handleLogin}>
           <div className="mb-3">
             <label className="form-label fw-semibold">Email</label>
@@ -52,7 +72,11 @@ function Login() {
             />
           </div>
 
-          <button className="btn btn-primary w-100" type="submit" disabled={loading}>
+          <button
+            className="btn btn-primary w-100"
+            type="submit"
+            disabled={loading}
+          >
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
@@ -60,7 +84,10 @@ function Login() {
         <div className="text-center mt-3">
           <small>
             Don’t have an account?{' '}
-            <Link to="/signup" className="text-decoration-none text-primary fw-semibold">
+            <Link
+              to="/signup"
+              className="text-decoration-none fw-semibold text-primary"
+            >
               Sign Up
             </Link>
           </small>
