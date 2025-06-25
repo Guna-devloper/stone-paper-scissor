@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { useCart } from "../Context/CartContext";
+import Collapse from "bootstrap/js/dist/collapse";
 
 function Navbar() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const { cart, cartBump } = useCart();
+  const collapseRef = useRef(null);
+  const collapseInstance = useRef(null);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -18,9 +21,26 @@ function Navbar() {
     return () => unsub();
   }, []);
 
+  useEffect(() => {
+    if (collapseRef.current) {
+      collapseInstance.current = new Collapse(collapseRef.current, {
+        toggle: false,
+      });
+    }
+  }, []);
+
   const handleLogout = () => {
     signOut(auth);
     navigate("/login");
+    collapseInstance.current?.hide();
+  };
+
+  const handleToggle = () => {
+    collapseInstance.current?.toggle();
+  };
+
+  const handleClose = () => {
+    collapseInstance.current?.hide();
   };
 
   return (
@@ -32,26 +52,28 @@ function Navbar() {
           background: "rgba(255, 255, 255, 0.75)",
           backdropFilter: "blur(10px)",
           boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+          zIndex: 1000,
         }}
       >
         <div className="container-fluid px-3">
           {/* Logo */}
-          <Link className="navbar-brand d-flex align-items-center" to="/">
-            <img
-              src="/sps-logo-removebg-preview.png"
-              alt="Logo"
-              width="40"
-              height="40"
-              className="me-2"
-            />
-            <span className="fw-bold text-primary d-none d-md-inline">
-              Stone Paper Scissor
-            </span>
-          </Link>
+     {/* Logo */}
+<Link className="navbar-brand d-flex align-items-center" to="/" onClick={handleClose}>
+  <img
+    src="/sps-logo-removebg-preview.png"
+    alt="Logo"
+    width="40"
+    height="40"
+    className="me-2"
+  />
+  <span className="fw-bold text-primary d-inline d-md-none">SPS</span>
+  <span className="fw-bold text-primary d-none d-md-inline">Stone Paper Scissor</span>
+</Link>
+
 
           {/* Cart & Hamburger */}
           <div className="d-flex align-items-center">
-            <Link className="nav-link position-relative me-2" to="/cart">
+            <Link className="nav-link position-relative me-2" to="/cart" onClick={handleClose}>
               <span
                 className={`fs-4 ${cartBump ? "cart-bump" : ""}`}
                 role="img"
@@ -69,8 +91,10 @@ function Navbar() {
             <button
               className="navbar-toggler"
               type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#navbarMobile"
+              aria-controls="navbarMobile"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+              onClick={handleToggle}
             >
               <span className="navbar-toggler-icon"></span>
             </button>
@@ -80,10 +104,11 @@ function Navbar() {
           <div
             className="collapse navbar-collapse mt-2 mt-lg-0"
             id="navbarMobile"
+            ref={collapseRef}
           >
             <ul className="navbar-nav ms-auto align-items-start gap-2 gap-lg-3">
               <li className="nav-item">
-                <Link className="nav-link text-dark fw-semibold" to="/shop">
+                <Link className="nav-link text-dark fw-semibold" to="/shop" onClick={handleClose}>
                   🛍 Shop
                 </Link>
               </li>
@@ -94,12 +119,17 @@ function Navbar() {
                     <Link
                       className="btn btn-outline-primary btn-sm w-100"
                       to="/login"
+                      onClick={handleClose}
                     >
                       Login
                     </Link>
                   </li>
                   <li className="nav-item">
-                    <Link className="btn btn-primary btn-sm w-100" to="/signup">
+                    <Link
+                      className="btn btn-primary btn-sm w-100"
+                      to="/signup"
+                      onClick={handleClose}
+                    >
                       Signup
                     </Link>
                   </li>
@@ -116,12 +146,12 @@ function Navbar() {
                   </span>
                   <ul className="dropdown-menu w-100">
                     <li>
-                      <Link className="dropdown-item" to="/profile">
+                      <Link className="dropdown-item" to="/profile" onClick={handleClose}>
                         Profile
                       </Link>
                     </li>
                     <li>
-                      <Link className="dropdown-item" to="/orders">
+                      <Link className="dropdown-item" to="/orders" onClick={handleClose}>
                         Orders
                       </Link>
                     </li>
@@ -147,19 +177,20 @@ function Navbar() {
         style={{
           background: "rgba(255, 255, 255, 0.9)",
           backdropFilter: "blur(10px)",
+          zIndex: 999,
         }}
       >
-        <Link to="/" className="text-center text-dark">
+        <Link to="/" className="text-center text-dark" onClick={handleClose}>
           <i className="bi bi-house-door fs-4"></i>
           <br />
           <small>Home</small>
         </Link>
-        <Link to="/shop" className="text-center text-dark">
+        <Link to="/shop" className="text-center text-dark" onClick={handleClose}>
           <i className="bi bi-bag fs-4"></i>
           <br />
           <small>Shop</small>
         </Link>
-        <Link to="/cart" className="text-center text-dark position-relative">
+        <Link to="/cart" className="text-center text-dark position-relative" onClick={handleClose}>
           <i className={`bi bi-cart fs-4 ${cartBump ? "cart-bump" : ""}`}></i>
           {cartCount > 0 && (
             <span className="position-absolute top-0 start-50 badge rounded-pill bg-danger">
@@ -170,13 +201,13 @@ function Navbar() {
           <small>Cart</small>
         </Link>
         {user ? (
-          <Link to="/profile" className="text-center text-dark">
+          <Link to="/profile" className="text-center text-dark" onClick={handleClose}>
             <i className="bi bi-person-circle fs-4"></i>
             <br />
             <small>Account</small>
           </Link>
         ) : (
-          <Link to="/login" className="text-center text-dark">
+          <Link to="/login" className="text-center text-dark" onClick={handleClose}>
             <i className="bi bi-box-arrow-in-right fs-4"></i>
             <br />
             <small>Login</small>

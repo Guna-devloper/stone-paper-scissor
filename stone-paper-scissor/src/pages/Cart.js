@@ -1,9 +1,15 @@
 import React from 'react';
 import { useCart } from '../Context/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 function Cart() {
   const { cart, removeFromCart, clearCart, increaseQty, decreaseQty } = useCart();
+  const navigate = useNavigate();
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const handleBuyNow = (item) => {
+    navigate(`/checkout?productId=${item.id}`);
+  };
 
   return (
     <div
@@ -52,7 +58,7 @@ function Cart() {
                       <h5 className="card-title text-primary mb-1">{item.name}</h5>
                       <p className="text-muted small mb-2">₹{item.price.toFixed(2)} each</p>
 
-                      <div className="d-flex align-items-center">
+                      <div className="d-flex align-items-center mb-2">
                         <button
                           className="btn btn-outline-dark btn-sm"
                           onClick={() => decreaseQty(item.id)}
@@ -68,6 +74,14 @@ function Cart() {
                           +
                         </button>
                       </div>
+
+                      {/* ✅ Buy Now Button */}
+                      <button
+                        className="btn btn-sm btn-primary"
+                        onClick={() => handleBuyNow(item)}
+                      >
+                        🚀 Buy Now
+                      </button>
                     </div>
 
                     <div className="text-end mt-3 mt-md-0">

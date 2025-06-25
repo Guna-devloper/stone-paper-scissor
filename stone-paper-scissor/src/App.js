@@ -10,6 +10,7 @@ import ProtectedRoute from './Components/ProtectedRoute';
 import { ToastContainer } from 'react-toastify'; // ✅ correct library
 import 'react-toastify/dist/ReactToastify.css'; // ✅ include styles
 import Navbar from './pages/Navbar';
+import BuyPage from './pages/BuyPage';
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-
+<Route path="/checkout" element={<BuyPage />} />
         <Route
           path="/shop"
           element={

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { collection, getDocs, limit, query } from 'firebase/firestore';
+import { Link, useNavigate } from 'react-router-dom';
+import { collection, getDocs, limit, query, startAfter } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useCart } from '../Context/CartContext';
 import banner from '../Images/banner-sps.png';
@@ -9,22 +9,40 @@ function Home() {
   const [featured, setFeatured] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showScroll, setShowScroll] = useState(false);
+  const [lastDoc, setLastDoc] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
   const { addToCart } = useCart();
+  const navigate = useNavigate();
+
+  const categories = ['Electrical', 'Gifts', 'Fancy', 'Fashion', 'Stationery'];
 
   useEffect(() => {
-    const fetch = async () => {
-      try {
-        const q = query(collection(db, 'products'), limit(8));
-        const snap = await getDocs(q);
-        const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setFeatured(data);
-      } catch (error) {
-        console.error('Error loading products:', error);
-      }
-      setLoading(false);
-    };
-    fetch();
+    fetchProducts();
   }, []);
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      let q = query(collection(db, 'products'), limit(8));
+      if (lastDoc) {
+        q = query(collection(db, 'products'), startAfter(lastDoc), limit(8));
+      }
+
+      const snap = await getDocs(q);
+      const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+      if (snap.docs.length > 0) {
+        setLastDoc(snap.docs[snap.docs.length - 1]);
+        setFeatured((prev) => [...prev, ...data]);
+      }
+      if (snap.docs.length < 8) {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error('Error loading products:', error);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
     const scrollEvent = () => {
@@ -36,29 +54,32 @@ function Home() {
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  const categories = ['Electrical', 'Gifts', 'Fancy', 'Fashion', 'Stationery'];
+  const handleBuyNow = (prod) => {
+    navigate(`/checkout?productId=${prod.id}`);
+  };
 
   return (
     <>
       {/* 🔔 Offer Strip */}
       <div
-        className="text-white text-center py-2 fw-semibold small"
+        className="text-dark text-center py-2 fw-bold small"
         style={{
-          background: 'linear-gradient(90deg, #FFDEE9 0%, #B5FFFC 100%)',
-          color: '#333',
+          background: 'linear-gradient(90deg, rgba(255,222,233,0.95) 0%, rgba(181,255,252,0.95) 100%)',
+          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+          letterSpacing: '0.5px',
         }}
       >
-        🚚 Free Delivery on Orders Above ₹999!
+        🚚 <strong>Free Delivery</strong> on Orders Above <span className="text-danger">₹999</span>!
       </div>
 
       {/* 🎠 Hero Banner */}
-      <div id="mainCarousel" className="carousel slide" data-bs-ride="carousel">
+      <div id="mainCarousel" className="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
         <div className="carousel-inner">
           <div className="carousel-item active">
             <img
               src={banner}
               className="d-block w-100"
-              alt="banner"
+              alt="Shop Now Banner"
               style={{ maxHeight: '350px', objectFit: 'cover' }}
             />
           </div>
@@ -66,14 +87,14 @@ function Home() {
             <img
               src="https://source.unsplash.com/1600x500/?shopping,mall"
               className="d-block w-100"
-              alt="banner2"
+              alt="Promotional Banner"
               style={{ maxHeight: '350px', objectFit: 'cover' }}
             />
           </div>
         </div>
       </div>
 
-      {/* 🛍️ Categories Section */}
+      {/* 🛍️ Categories */}
       <div className="container py-5">
         <h4 className="mb-4 text-center fw-bold text-gradient">Shop by Category</h4>
         <div className="row g-4 justify-content-center">
@@ -102,61 +123,89 @@ function Home() {
       <div className="container pb-5">
         <h4 className="mb-4 text-center fw-bold text-gradient">Featured Products</h4>
 
-        {loading ? (
+        {loading && featured.length === 0 ? (
           <div className="text-center my-5">
             <div className="spinner-border text-primary" role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
           </div>
         ) : (
-          <div className="row g-4">
-            {featured.map((prod) => (
-              <div className="col-6 col-sm-6 col-md-3" key={prod.id}>
-                <div
-                  className="card h-100 shadow-lg border-0"
-                  style={{
-                    borderRadius: '15px',
-                    background: 'rgba(255, 255, 255, 0.9)',
-                    backdropFilter: 'blur(10px)',
-                  }}
-                >
-                  <img
-                    src={prod.imageBase64 || prod.imageURL}
-                    className="card-img-top"
-                    alt={prod.name}
-                    style={{ height: 180, objectFit: 'cover', borderTopLeftRadius: 15, borderTopRightRadius: 15 }}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/180x180?text=Image+Not+Found';
+          <>
+            <div className="row g-4">
+              {featured.map((prod) => (
+                <div className="col-6 col-sm-6 col-md-3" key={prod.id}>
+                  <div
+                    className="card h-100 shadow-lg border-0"
+                    style={{
+                      borderRadius: '15px',
+                      background: 'rgba(255, 255, 255, 0.9)',
+                      backdropFilter: 'blur(10px)',
                     }}
-                  />
-                  <div className="card-body d-flex flex-column">
-                    <h6 className="card-title">{prod.name}</h6>
-                    <p className="text-muted small mb-1">₹{prod.price}</p>
-                    <div className="mb-2">
-                      <span className="text-warning small">★ ★ ★ ★ ☆</span>
-                      <small className="text-muted ms-1">(120)</small>
+                  >
+                    <img
+                      src={prod.imageBase64 || prod.imageURL}
+                      className="card-img-top"
+                      alt={prod.name || 'Product'}
+                      style={{
+                        height: 180,
+                        objectFit: 'cover',
+                        borderTopLeftRadius: 15,
+                        borderTopRightRadius: 15,
+                      }}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/180x180?text=Image+Not+Found';
+                      }}
+                    />
+                    <div className="card-body d-flex flex-column">
+                      <h6 className="card-title">{prod.name}</h6>
+                      <p className="text-muted small mb-1">₹{prod.price}</p>
+                      <div className="mb-2">
+                        <span className="text-warning small">
+                          {"★".repeat(prod.rating || 4)}
+                          {"☆".repeat(5 - (prod.rating || 4))}
+                        </span>
+                        <small className="text-muted ms-1">
+                          ({prod.ratingCount || 120})
+                        </small>
+                      </div>
+
+                      {/* ✅ Buy Now button */}
+                      <button
+                        className="btn btn-primary btn-sm mb-2"
+                        onClick={() => handleBuyNow(prod)}
+                      >
+                        🚀 Buy Now
+                      </button>
+
+                      {/* 🛒 Add to Cart button */}
+                      <button
+                        onClick={() => addToCart(prod)}
+                        className="btn btn-outline-primary btn-sm mt-auto"
+                      >
+                        🛒 Add to Cart
+                      </button>
                     </div>
-                    <button
-                      onClick={() => addToCart(prod)}
-                      className="btn btn-outline-primary btn-sm mt-auto"
-                    >
-                      🛒 Add to Cart
-                    </button>
                   </div>
                 </div>
+              ))}
+            </div>
+
+            {hasMore && (
+              <div className="text-center mt-4">
+                <button className="btn btn-outline-primary" onClick={fetchProducts}>
+                  Load More Products
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
 
-      {/* 🎁 CTA */}
+      {/* 🎁 CTA Section */}
       <div
         className="text-white text-center py-5"
-        style={{
-          background: 'linear-gradient(to right, #D8B5FF, #1EAE98)',
-        }}
+        style={{ background: 'linear-gradient(to right, #D8B5FF, #1EAE98)' }}
       >
         <h4 className="fw-bold">Start Shopping Today</h4>
         <p className="lead small">Best products. Best prices. Best experience.</p>
@@ -170,8 +219,10 @@ function Home() {
         className="text-white text-center py-4"
         style={{ background: 'linear-gradient(to right, #141E30, #243B55)' }}
       >
-        <img src="/sps-logo-removebg-preview.png" alt="logo" style={{ width: 80 }} className="mb-2" />
-        <p className="mb-0 small">&copy; {new Date().getFullYear()} Stone Paper Scissor | All Rights Reserved</p>
+        <img src="/sps-logo-removebg-preview.png" alt="SPS Logo" style={{ width: 80 }} className="mb-2" />
+        <p className="mb-0 small">
+          &copy; {new Date().getFullYear()} Stone Paper Scissor | All Rights Reserved
+        </p>
       </footer>
 
       {/* 🔼 Scroll To Top */}
@@ -179,6 +230,7 @@ function Home() {
         <button
           onClick={scrollToTop}
           className="btn btn-primary rounded-circle shadow position-fixed"
+          aria-label="Scroll to top"
           style={{
             bottom: '20px',
             right: '20px',
