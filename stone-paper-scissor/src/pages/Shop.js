@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useCart } from '../Context/CartContext';
@@ -8,6 +8,7 @@ function Shop() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
   const { addToCart } = useCart();
 
   const queryParams = new URLSearchParams(location.search);
@@ -35,6 +36,10 @@ function Shop() {
     fetchProducts();
   }, [selectedCategory]);
 
+  const handleBuyNow = (product) => {
+    navigate(`/checkout?productId=${product.id}`);
+  };
+
   return (
     <div
       className="container py-5"
@@ -44,7 +49,9 @@ function Shop() {
       }}
     >
       <h3 className="mb-4 text-center text-primary fw-bold">
-        🛍️ {selectedCategory ? `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Products` : 'All Products'}
+        🛍️ {selectedCategory
+          ? `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Products`
+          : 'All Products'}
       </h3>
 
       {loading ? (
@@ -71,7 +78,12 @@ function Shop() {
                   src={product.imageBase64 || product.imageURL}
                   className="card-img-top"
                   alt={product.name}
-                  style={{ height: 180, objectFit: 'cover', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}
+                  style={{
+                    height: 180,
+                    objectFit: 'cover',
+                    borderTopLeftRadius: '12px',
+                    borderTopRightRadius: '12px'
+                  }}
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = 'https://via.placeholder.com/180x180?text=No+Image';
@@ -84,6 +96,16 @@ function Shop() {
                     <span className="text-warning small">★ ★ ★ ★ ☆</span>
                     <small className="text-muted ms-1">(56)</small>
                   </div>
+
+                  {/* ✅ Buy Now Button */}
+                  <button
+                    className="btn btn-primary btn-sm mb-2"
+                    onClick={() => handleBuyNow(product)}
+                  >
+                    🚀 Buy Now
+                  </button>
+
+                  {/* 🛒 Add to Cart Button */}
                   <button
                     className="btn btn-outline-primary btn-sm mt-auto"
                     onClick={() => addToCart(product)}

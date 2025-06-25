@@ -37,7 +37,10 @@ function BuyPage() {
     }
   };
 
-  const total = products.reduce((sum, item) => sum + item.price * item.quantity + 9, 0);
+  const total = products.reduce(
+    (sum, item) => sum + (item.price * (item.quantity || 1)) + 9,
+    0
+  );
 
   if (loading) {
     return (

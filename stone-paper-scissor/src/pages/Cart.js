@@ -1,15 +1,17 @@
 import React from 'react';
-import { useCart } from '../Context/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../Context/CartContext';
 
 function Cart() {
-  const { cart, removeFromCart, clearCart, increaseQty, decreaseQty } = useCart();
+  const {
+    cart,
+    removeFromCart,
+    clearCart,
+    increaseQty,
+    decreaseQty
+  } = useCart();
   const navigate = useNavigate();
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-  const handleBuyNow = (item) => {
-    navigate(`/checkout?productId=${item.id}`);
-  };
 
   return (
     <div
@@ -58,7 +60,7 @@ function Cart() {
                       <h5 className="card-title text-primary mb-1">{item.name}</h5>
                       <p className="text-muted small mb-2">₹{item.price.toFixed(2)} each</p>
 
-                      <div className="d-flex align-items-center mb-2">
+                      <div className="d-flex align-items-center">
                         <button
                           className="btn btn-outline-dark btn-sm"
                           onClick={() => decreaseQty(item.id)}
@@ -74,18 +76,12 @@ function Cart() {
                           +
                         </button>
                       </div>
-
-                      {/* ✅ Buy Now Button */}
-                      <button
-                        className="btn btn-sm btn-primary"
-                        onClick={() => handleBuyNow(item)}
-                      >
-                        🚀 Buy Now
-                      </button>
                     </div>
 
                     <div className="text-end mt-3 mt-md-0">
-                      <h6 className="text-success">Subtotal: ₹{(item.price * item.quantity).toFixed(2)}</h6>
+                      <h6 className="text-success">
+                        Subtotal: ₹{(item.price * item.quantity).toFixed(2)}
+                      </h6>
                       <button
                         className="btn btn-outline-danger btn-sm mt-2"
                         onClick={() => removeFromCart(item.id)}
@@ -99,11 +95,16 @@ function Cart() {
             </div>
           ))}
 
-          <div className="d-flex justify-content-between align-items-center mt-4 border-top pt-3">
+          <div className="d-flex justify-content-between align-items-center mt-4 border-top pt-3 flex-wrap gap-2">
             <h5 className="text-gradient fw-bold">Total: ₹{total.toFixed(2)}</h5>
-            <button className="btn btn-danger" onClick={clearCart}>
-              🧹 Clear Cart
-            </button>
+            <div className="d-flex gap-2">
+              <button className="btn btn-success" onClick={() => navigate('/checkout?mode=all')}>
+                🛍️ Buy All Items
+              </button>
+              <button className="btn btn-danger" onClick={clearCart}>
+                🧹 Clear Cart
+              </button>
+            </div>
           </div>
         </>
       )}
