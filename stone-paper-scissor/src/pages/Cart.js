@@ -95,13 +95,22 @@ function Cart() {
             </div>
           ))}
 
-          <div className="d-flex justify-content-between align-items-center mt-4 border-top pt-3 flex-wrap gap-2">
-            <h5 className="text-gradient fw-bold">Total: ₹{total.toFixed(2)}</h5>
-            <div className="d-flex gap-2">
-              <button className="btn btn-success" onClick={() => navigate('/checkout?mode=all')}>
+          {/* ✅ Side-by-side Buttons */}
+          <div className="mt-4 border-top pt-3">
+            <h5 className="text-gradient fw-bold mb-3">Total: ₹{total.toFixed(2)}</h5>
+            <div className="d-flex justify-content-between flex-wrap gap-2">
+              <button
+                className="btn btn-success flex-fill me-2"
+                style={{ minWidth: '150px' }}
+                onClick={() => navigate('/checkout?mode=all')}
+              >
                 🛍️ Buy All Items
               </button>
-              <button className="btn btn-danger" onClick={clearCart}>
+              <button
+                className="btn btn-danger flex-fill ms-2"
+                style={{ minWidth: '150px' }}
+                onClick={clearCart}
+              >
                 🧹 Clear Cart
               </button>
             </div>

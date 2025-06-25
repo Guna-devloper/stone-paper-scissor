@@ -7,13 +7,16 @@ import Collapse from "bootstrap/js/dist/collapse";
 
 function Navbar() {
   const [user, setUser] = useState(null);
+  const [scrollDir, setScrollDir] = useState("down");
   const navigate = useNavigate();
   const { cart, cartBump } = useCart();
   const collapseRef = useRef(null);
   const collapseInstance = useRef(null);
+  const lastScrollY = useRef(window.scrollY);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
+  // Auth state
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -21,12 +24,29 @@ function Navbar() {
     return () => unsub();
   }, []);
 
+  // Collapse menu init
   useEffect(() => {
     if (collapseRef.current) {
       collapseInstance.current = new Collapse(collapseRef.current, {
         toggle: false,
       });
     }
+  }, []);
+
+  // Scroll direction detection
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      if (currentY > lastScrollY.current && currentY - lastScrollY.current > 5) {
+        setScrollDir("up");
+      } else if (currentY < lastScrollY.current && lastScrollY.current - currentY > 5) {
+        setScrollDir("down");
+      }
+      lastScrollY.current = currentY;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleLogout = () => {
@@ -57,21 +77,21 @@ function Navbar() {
       >
         <div className="container-fluid px-3">
           {/* Logo */}
-     {/* Logo */}
-<Link className="navbar-brand d-flex align-items-center" to="/" onClick={handleClose}>
-  <img
-    src="/sps-logo-removebg-preview.png"
-    alt="Logo"
-    width="40"
-    height="40"
-    className="me-2"
-  />
-  <span className="fw-bold text-primary d-inline d-md-none">SPS</span>
-  <span className="fw-bold text-primary d-none d-md-inline">Stone Paper Scissor</span>
-</Link>
+          <Link className="navbar-brand d-flex align-items-center" to="/" onClick={handleClose}>
+            <img
+              src="/sps-logo-removebg-preview.png"
+              alt="Logo"
+              width="40"
+              height="40"
+              className="me-2"
+            />
+            <span className="fw-bold text-primary d-inline d-md-none">SPS</span>
+            <span className="fw-bold text-primary d-none d-md-inline">
+              Stone Paper Scissor
+            </span>
+          </Link>
 
-
-          {/* Cart & Hamburger */}
+          {/* Cart & Toggle */}
           <div className="d-flex align-items-center">
             <Link className="nav-link position-relative me-2" to="/cart" onClick={handleClose}>
               <span
@@ -171,13 +191,16 @@ function Navbar() {
         </div>
       </nav>
 
-      {/* Bottom Mobile Nav */}
+      {/* Bottom Mobile Nav - Auto Hide on Scroll Up */}
       <div
-        className="d-lg-none d-flex justify-content-around fixed-bottom py-2 border-top"
+        className={`d-lg-none d-flex justify-content-around fixed-bottom py-2 border-top transition-bottom ${
+          scrollDir === "up" ? "hide-navbar" : ""
+        }`}
         style={{
           background: "rgba(255, 255, 255, 0.9)",
           backdropFilter: "blur(10px)",
           zIndex: 999,
+          transition: "transform 0.3s ease",
         }}
       >
         <Link to="/" className="text-center text-dark" onClick={handleClose}>
@@ -214,6 +237,13 @@ function Navbar() {
           </Link>
         )}
       </div>
+
+      {/* Inline CSS class to hide bottom nav */}
+      <style>{`
+        .hide-navbar {
+          transform: translateY(100%);
+        }
+      `}</style>
     </>
   );
 }
